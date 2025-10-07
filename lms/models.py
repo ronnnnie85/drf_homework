@@ -32,7 +32,7 @@ class Lesson(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        verbose_name="Название rehcf",
+        verbose_name="Название курса",
         help_text="Укажите название курса",
     )
     name = models.CharField(
