@@ -1,7 +1,12 @@
+import os
+
+from dotenv import load_dotenv
 from rest_framework import serializers
 
 from users.models import Payment, User
 
+load_dotenv()
+MOD_GROUP = os.getenv('MOD_GROUP')
 
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
