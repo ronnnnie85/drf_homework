@@ -6,7 +6,8 @@ from rest_framework import serializers
 from lms.models import Course, Lesson
 
 load_dotenv()
-MOD_GROUP = os.getenv('MOD_GROUP')
+MOD_GROUP = os.getenv("MOD_GROUP")
+
 
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,7 +21,15 @@ class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ("id", "name", "preview", "description", "lessons_count", "lessons", "owner",)
+        fields = (
+            "id",
+            "name",
+            "preview",
+            "description",
+            "lessons_count",
+            "lessons",
+            "owner",
+        )
 
     def _filtered_lessons_qs(self, course: Course):
         request = self.context.get("request")
@@ -42,4 +51,3 @@ class CourseSerializer(serializers.ModelSerializer):
 
     def get_lessons_count(self, obj: Course) -> int:
         return self._filtered_lessons_qs(obj).count()
-
