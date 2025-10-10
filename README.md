@@ -1,153 +1,169 @@
-# 📘 Django LMS API
+# 📘 Django LMS API — обновлённый README
 
-REST API для управления курсами, уроками и оплатами.  
-Реализовано на **Django + Django REST Framework**, поддерживает фильтрацию, сортировку и имеет несколько кастомных management-команд.
+Ниже — доработанная версия README для проекта на **Django + Django REST Framework** (модуль LMS и платежи). Добавлены: чёткий quickstart, таблица переменных окружения, раздел про пагинацию/сортировку/фильтрацию с примерами, curl‑примеры, раздел «Тестирование», а также навигация по кастомным management‑командам.
 
 ---
 
-## 🚀 Запуск проекта
+## 🔎 Оглавление
+- [Требования](#-требования)
+- [Быстрый старт](#-быстрый-старт)
+- [Переменные окружения](#-переменные-окружения)
+- [Запуск и доступ](#-запуск-и-доступ)
+- [API](#-api)
+  - [LMS (`/lms/`)](#lms-lms)
+  - [Пользователи и платежи (`/users/`)](#-пользователи-и-платежи-users)
+  - [Параметры запроса: фильтры, сортировка, пагинация](#-параметры-запроса-фильтры-сортировка-пагинация)
+  - [Примеры запросов](#-примеры-запросов)
+- [Кастомные management‑команды](#-кастомные-management-команды)
+- [Структура проекта](#-структура-проекта)
+- [Тестирование](#-тестирование)
+- [Полезное](#-полезное)
 
-### 1. Установка
+---
+
+## ✅ Требования
+- Python 3.11+
+- pip, venv
+- SQLite (по умолчанию) или другая БД, настроенная в `settings.py`
+
+## 🚀 Быстрый старт
 ```bash
+# 1) Клонирование
 git clone <repo_url>
 cd <project_name>
+
+# 2) Виртуальное окружение и зависимости
 python -m venv venv
-source venv/bin/activate  # (Windows: venv\Scripts\activate)
+source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-```
 
----
-
-### 2. Настройка окружения
-В репозитории есть пример `.env_sample` — скопируй и переименуй его:
-```bash
+# 3) Конфигурация окружения
 cp .env_sample .env
-```
-Заполни свои значения:
-```env
-ADMIN_MAIL=admin@example.com
-ADMIN_PASS=supersecret
-DEBUG=True
-SECRET_KEY=your_secret_key_here
-ALLOWED_HOSTS=127.0.0.1,localhost
-```
+# отредактируйте значения под себя
 
-> ⚠️ `.env` не должен попадать в git — добавь его в `.gitignore`.
-
----
-
-### 3. Миграции и создание суперпользователя
-```bash
+# 4) Миграции и базовые данные
 python manage.py migrate
-python manage.py csu
-```
-Команда `csu` создаст суперпользователя, используя данные из `.env`.
+python manage.py csu                 # создаст суперпользователя из .env
+python manage.py seed_courses_lessons
+python manage.py create_payments
 
----
-
-### 4. Запуск сервера
-```bash
+# 5) Запуск dev‑сервера
 python manage.py runserver
 ```
-После запуска:
-- Админ-панель → [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/)
-- API → [http://127.0.0.1:8000/lms/](http://127.0.0.1:8000/lms/)
-- Пользователи/платежи → [http://127.0.0.1:8000/users/](http://127.0.0.1:8000/users/)
 
----
+## 🔐 Переменные окружения
+| Ключ          | Пример                | Описание                            |
+|---------------|-----------------------|-------------------------------------|
+| `ADMIN_MAIL`  | `admin@example.com`   | Логин суперпользователя для `csu`   |
+| `ADMIN_PASS`  | `supersecret`         | Пароль суперпользователя для `csu`  |
+| `DEBUG`       | `True`                | Режим отладки                       |
+| `SECRET_KEY`  | `your_secret_key`     | Секретный ключ Django               |
+| `ALLOWED_HOSTS` | `127.0.0.1,localhost` | Разрешённые хосты                  |
 
-## 🧩 Основные эндпоинты API
+> ⚠️ Никогда не коммитьте `.env` — добавьте его в `.gitignore`.
 
-### 📚 LMS-модуль (`/lms/`)
-| Метод | URL | Описание |
-|--------|-----|-----------|
-| `GET` | `/lms/courses/` | Получить список курсов |
-| `GET` | `/lms/courses/<id>/` | Получить курс с уроками |
-| `POST` | `/lms/courses/` | Создать курс |
-| `PUT/PATCH` | `/lms/courses/<id>/` | Обновить курс |
-| `DELETE` | `/lms/courses/<id>/` | Удалить курс |
-| `GET` | `/lms/lessons/` | Список всех уроков |
-| `POST` | `/lms/lessons/create/` | Создание урока |
-| `GET` | `/lms/lessons/<id>/` | Просмотр урока |
-| `PUT/PATCH` | `/lms/lessons/<id>/update/` | Обновление урока |
-| `DELETE` | `/lms/lessons/<id>/delete/` | Удаление урока |
+## 🌐 Запуск и доступ
+- Админка: <http://127.0.0.1:8000/admin/>
+- LMS API: <http://127.0.0.1:8000/lms/>
+- Пользователи/платежи: <http://127.0.0.1:8000/users/>
 
----
+## 🧩 API
 
-### 💳 Пользователи и платежи (`/users/`)
-| Метод | URL | Описание |
-|--------|-----|-----------|
-| `GET` | `/users/payments/` | Получить все оплаты |
-| `POST` | `/users/payments/` | Добавить оплату |
-| `GET` | `/users/payments/<id>/` | Получить оплату |
-| `PUT/PATCH` | `/users/payments/<id>/` | Изменить оплату |
-| `DELETE` | `/users/payments/<id>/` | Удалить оплату |
-| 🔍 Фильтры | `?paid_course=1&payment_method=cash` |
-| ↕️ Сортировка | `?ordering=payment_date` |
+### LMS (`/lms/`)
+| Метод | URL                     | Описание                   |
+|------:|-------------------------|----------------------------|
+| GET   | `/lms/courses/`         | Список курсов              |
+| GET   | `/lms/courses/<id>/`    | Курс с уроками             |
+| POST  | `/lms/courses/`         | Создать курс               |
+| PUT/PATCH | `/lms/courses/<id>/`| Обновить курс              |
+| DELETE | `/lms/courses/<id>/`   | Удалить курс               |
+| GET   | `/lms/lessons/`         | Список всех уроков         |
+| POST  | `/lms/lessons/create/`  | Создать урок               |
+| GET   | `/lms/lessons/<id>/`    | Просмотр урока             |
+| PUT/PATCH | `/lms/lessons/<id>/update/` | Обновление урока |
+| DELETE | `/lms/lessons/<id>/delete/`   | Удаление урока   |
 
----
+### 👥 Пользователи и платежи (`/users/`)
+| Метод | URL                         | Описание                |
+|------:|-----------------------------|-------------------------|
+| GET   | `/users/payments/`          | Получить все оплаты     |
+| POST  | `/users/payments/`          | Добавить оплату         |
+| GET   | `/users/payments/<id>/`     | Получить оплату         |
+| PUT/PATCH | `/users/payments/<id>/` | Изменить оплату         |
+| DELETE | `/users/payments/<id>/`    | Удалить оплату          |
 
-## ⚙️ Кастомные management-команды
+#### 🔧 Параметры запроса: фильтры, сортировка, пагинация
+- **Фильтры**: `?paid_course=<id>&payment_method=<cash|card|transfer>`
+- **Сортировка**: `?ordering=payment_date` (добавьте `-` для убывания: `?ordering=-payment_date`)
+- **Пагинация** (стандарт DRF):
+  - `?page=2` — номер страницы
+  - `?page_size=20` — размер страницы (если разрешено настройками)
 
-### 🧮 `seed_courses_lessons`
-Создает 2 тестовых курса (*Математика*, *Физика*) и по 2 урока на каждый.  
-Очищает таблицы `Course` и `Lesson` перед добавлением.
+#### 📎 Примеры запросов
+```bash
+# Список курсов
+curl -s http://127.0.0.1:8000/lms/courses/
+
+# Курс по id
+curl -s http://127.0.0.1:8000/lms/courses/1/
+
+# Создать курс (пример)
+curl -s -X POST http://127.0.0.1:8000/lms/courses/ \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Математика"}'
+
+# Платежи с фильтрами и сортировкой
+curl -s "http://127.0.0.1:8000/users/payments/?paid_course=1&payment_method=cash&ordering=-payment_date"
+
+# Пагинация платежей
+curl -s "http://127.0.0.1:8000/users/payments/?page=2&page_size=20"
+```
+
+> ℹ️ Аутентификация: если включите пермишены/аутентификацию в DRF (например, TokenAuth), добавьте сюда раздел с требуемыми заголовками.
+
+## ⚙️ Кастомные management‑команды
+- `seed_courses_lessons` — создаёт тестовые курсы и уроки, предварительно очищая таблицы.
+- `create_payments` — добавляет 3 тестовых оплаты (2 за уроки, 1 за курс).
+- `csu` — создаёт суперпользователя из переменных `.env` (`ADMIN_MAIL`, `ADMIN_PASS`).
+
+Примеры:
 ```bash
 python manage.py seed_courses_lessons
-```
-**Вывод:**
-```
-Удалено: уроков=4, курсов=2
-Создано: курсов=2, уроков=4
-```
-
----
-
-### 💳 `create_payments`
-Добавляет 3 тестовых оплаты:
-- 2 за уроки  
-- 1 за курс  
-(требуется наличие хотя бы одного пользователя и курсов).
-```bash
 python manage.py create_payments
-```
-**Вывод:**
-```
-🗑 Удалено старых записей: 3
-Успешно добавлено 3 записи в таблицу Payment
-```
-
----
-
-### 👤 `csu`
-Создает суперпользователя из данных `.env` (`ADMIN_MAIL`, `ADMIN_PASS`).
-```bash
 python manage.py csu
 ```
-**Вывод:**
-```
-Superuser создан: admin@example.com
-```
-
----
 
 ## 🧱 Структура проекта
-
 ```
 config/
- ├── urls.py               # Главный роутинг проекта
+ ├── urls.py                # Главный роутинг проекта
 lms/
- ├── models.py             # Course, Lesson
- ├── serializers.py        # DRF-сериализаторы
- ├── views.py              # CourseViewSet, Lesson CRUD
- ├── urls.py               # Роутинг /lms/
+ ├── models.py              # Course, Lesson
+ ├── serializers.py         # DRF‑сериализаторы
+ ├── views.py               # CourseViewSet, Lesson CRUD
+ ├── urls.py                # Роутинг /lms/
  ├── management/commands/
  │    ├── seed_courses_lessons.py
  │    ├── create_payments.py
  │    └── csu.py
 users/
- ├── models.py             # User, Payment
- ├── views.py              # PaymentViewSet
- ├── urls.py               # Роутинг /users/
-.env_sample                # пример конфигурации окружения
+ ├── models.py              # User, Payment
+ ├── views.py               # PaymentViewSet
+ ├── urls.py                # Роутинг /users/
+.env_sample                 # пример конфигурации окружения
 ```
+
+## 🧪 Тестирование
+```bash
+# Запуск всех тестов
+pytest -q
+
+# С пояснениями/покрытием (если настроено)
+pytest -q -vv --cov
+```
+
+## 🧰 Полезное
+- Проверьте `settings.py` на предмет включённой пагинации DRF (`REST_FRAMEWORK['DEFAULT_PAGINATION_CLASS']`, `PAGE_SIZE`).
+- Добавьте Docker/Compose при необходимости — тогда здесь появится раздел «Запуск через Docker».
+- Откройте Issue/PR шаблоны для более формального процесса разработки.
+
