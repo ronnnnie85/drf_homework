@@ -4,12 +4,15 @@ from dotenv import load_dotenv
 from rest_framework import serializers
 
 from lms.models import Course, Lesson
+from lms.validators import VideoURLValidator
 
 load_dotenv()
 MOD_GROUP = os.getenv("MOD_GROUP")
 
 
 class LessonSerializer(serializers.ModelSerializer):
+    video = serializers.CharField(validators=[VideoURLValidator()])
+
     class Meta:
         model = Lesson
         fields = "__all__"
