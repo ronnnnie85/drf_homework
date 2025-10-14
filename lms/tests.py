@@ -25,7 +25,7 @@ class LessonTestCase(APITestCase):
             course=self.course,
             name="Lesson 1",
             description="Content of lesson 1",
-            owner=self.owner
+            owner=self.owner,
         )
 
     def test_create_lesson(self):
@@ -35,7 +35,7 @@ class LessonTestCase(APITestCase):
             "course": self.course.id,
             "name": "New Lesson",
             "description": "New lesson content",
-            "video": "https://youtube.com/watch?v=abc"
+            "video": "https://youtube.com/watch?v=abc",
         }
         response = self.client.post("/lms/lessons/create/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -46,9 +46,11 @@ class LessonTestCase(APITestCase):
         data = {
             "name": "Updated Lesson 1",
             "description": "Updated content of lesson 1",
-            "video": "https://youtube.com/watch?v=abc"
+            "video": "https://youtube.com/watch?v=abc",
         }
-        response = self.client.put(f"/lms/lessons/{self.lesson_1.id}/update/", data, format="json")
+        response = self.client.put(
+            f"/lms/lessons/{self.lesson_1.id}/update/", data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.lesson_1.refresh_from_db()
         self.assertEqual(self.lesson_1.name, "Updated Lesson 1")
@@ -83,7 +85,9 @@ class LessonTestCase(APITestCase):
             "name": "Updated Unauthorized Lesson",
             "description": "Unauthorized content update",
         }
-        response = self.client.put(f"/lms/lessons/{self.lesson_1.id}/update/", data, format="json")
+        response = self.client.put(
+            f"/lms/lessons/{self.lesson_1.id}/update/", data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
@@ -116,4 +120,3 @@ class SubscriptionTestCase(APITestCase):
         response = self.client.post("/lms/subscription/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertFalse(response.data["subscribed"])
-

@@ -67,8 +67,7 @@ class CourseSerializer(serializers.ModelSerializer):
 
 class SubscriptionToggleSerializer(serializers.Serializer):
     course = serializers.PrimaryKeyRelatedField(
-        queryset=Course.objects.all(),
-        write_only=True
+        queryset=Course.objects.all(), write_only=True
     )
 
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
