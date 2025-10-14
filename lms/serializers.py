@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from rest_framework import serializers
 
-from lms.models import Course, Lesson
+from lms.models import Course, Lesson, Subscription
 from lms.validators import VideoURLValidator
 
 load_dotenv()
@@ -21,6 +21,7 @@ class LessonSerializer(serializers.ModelSerializer):
 class CourseSerializer(serializers.ModelSerializer):
     lessons_count = serializers.SerializerMethodField()
     lessons = serializers.SerializerMethodField()
+    is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
@@ -32,6 +33,7 @@ class CourseSerializer(serializers.ModelSerializer):
             "lessons_count",
             "lessons",
             "owner",
+            "is_subscribed",
         )
 
     def _filtered_lessons_qs(self, course: Course):
@@ -54,3 +56,19 @@ class CourseSerializer(serializers.ModelSerializer):
 
     def get_lessons_count(self, obj: Course) -> int:
         return self._filtered_lessons_qs(obj).count()
+
+    def get_is_subscribed(self, obj: Course) -> bool:
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        if not user or not user.is_authenticated:
+            return False
+        return Subscription.objects.filter(user=user, course=obj).exists()
+
+
+class SubscriptionToggleSerializer(serializers.Serializer):
+    course = serializers.PrimaryKeyRelatedField(
+        queryset=Course.objects.all(),
+        write_only=True
+    )
+
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())

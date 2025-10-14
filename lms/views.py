@@ -1,14 +1,17 @@
 import os
 
+from rest_framework import status
 from rest_framework.generics import (CreateAPIView, DestroyAPIView,
                                      ListAPIView, RetrieveAPIView,
                                      UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import APIView
 
-from lms.models import Course, Lesson
+from lms.models import Course, Lesson, Subscription
 from lms.permissions import ModeratorsNoCreateDelete, OwnerOnlyForNonModerators
-from lms.serializers import CourseSerializer, LessonSerializer
+from lms.serializers import CourseSerializer, LessonSerializer, SubscriptionToggleSerializer
 
 
 class CourseViewSet(ModelViewSet):
@@ -91,3 +94,32 @@ class LessonDestroyView(DestroyAPIView):
         ModeratorsNoCreateDelete,
         OwnerOnlyForNonModerators,
     ]
+
+
+class SubscriptionToggleAPIView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = SubscriptionToggleSerializer(
+            data=request.data, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.validated_data["user"]
+        course = serializer.validated_data["course"]
+
+        qs = Subscription.objects.filter(user=user, course=course)
+
+        if qs.exists():
+            qs.delete()
+            message = "Подписка удалена"
+            subscribed = False
+            http_status = status.HTTP_200_OK
+        else:
+            Subscription.objects.create(user=user, course=course)
+            message = "Подписка добавлена"
+            subscribed = True
+            http_status = status.HTTP_201_CREATED
+
+        return Response({"message": message, "subscribed": subscribed}, status=http_status)
