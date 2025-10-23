@@ -6,7 +6,8 @@ from rest_framework import serializers
 from users.models import Payment, User
 
 load_dotenv()
-MOD_GROUP = os.getenv('MOD_GROUP')
+MOD_GROUP = os.getenv("MOD_GROUP")
+
 
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,5 +19,3 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("email", "phone", "city", "avatar", "id")
-
-

@@ -1,10 +1,11 @@
 import os
 
 from dotenv import load_dotenv
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 load_dotenv()
-MOD_GROUP = os.getenv('MOD_GROUP')
+MOD_GROUP = os.getenv("MOD_GROUP")
+
 
 class ModeratorsNoCreateDelete(BasePermission):
     def has_permission(self, request, view):
@@ -14,7 +15,7 @@ class ModeratorsNoCreateDelete(BasePermission):
 
         is_moderator = user.groups.filter(name=MOD_GROUP).exists()
 
-        if is_moderator and request.method in ('POST', 'DELETE'):
+        if is_moderator and request.method in ("POST", "DELETE"):
             return False
 
         return True
