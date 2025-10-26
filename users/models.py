@@ -97,6 +97,34 @@ class Payment(models.Model):
         verbose_name="Оплаченный курс",
         help_text="Укажите оплаченный курс",
     )
+    stripe_product_id = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="ID продукта",
+        help_text="Укажите ID продукта",
+    )
+    stripe_price_id = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="ID цены",
+        help_text="Укажите ID цены",
+    )
+    stripe_session_id = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="ID сессии",
+        help_text="Укажите ID сессии",
+    )
+    checkout_url = models.URLField(
+        max_length=2000,
+        blank=True,
+        null=True,
+        verbose_name="Ссыла на оплату",
+        help_text="Укажите ссылку на оплату",
+    )
 
     def __str__(self):
         return f"{self.paid_lesson if self.paid_lesson else self.paid_course} {self.amount}"
