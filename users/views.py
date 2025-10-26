@@ -9,7 +9,11 @@ from rest_framework.views import APIView
 from config import settings
 from users import services
 from users.models import Payment, User
-from users.serializers import PaymentSerializer, UserSerializer, PaymentCheckoutSerializer
+from users.serializers import (
+    PaymentSerializer,
+    UserSerializer,
+    PaymentCheckoutSerializer,
+)
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
@@ -81,10 +85,15 @@ class PaymentCheckoutCreateAPIView(APIView):
         )
         payment.stripe_session_id = session["id"]
         payment.checkout_url = session["url"]
-        payment.save(update_fields=[
-            "stripe_product_id", "stripe_price_id",
-            "stripe_session_id", "checkout_url", "status"
-        ])
+        payment.save(
+            update_fields=[
+                "stripe_product_id",
+                "stripe_price_id",
+                "stripe_session_id",
+                "checkout_url",
+                "status",
+            ]
+        )
 
         return Response(
             {

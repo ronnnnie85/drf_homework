@@ -3,6 +3,7 @@ from django.conf import settings
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
+
 def create_product(name: str, description: str | None = None) -> dict:
     """Создаёт продукт в Stripe"""
     return stripe.Product.create(name=name, description=description or "")
@@ -12,7 +13,7 @@ def create_price(product_id: str, unit_amount: int, currency: str) -> dict:
     """Создаёт цену в Stripe"""
     return stripe.Price.create(
         product=product_id,
-        unit_amount=unit_amount,   # сумма в копейках
+        unit_amount=unit_amount,  # сумма в копейках
         currency=currency,
     )
 

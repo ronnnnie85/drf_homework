@@ -33,7 +33,11 @@ class PaymentCheckoutSerializer(serializers.Serializer):
         payment = attrs["payment"]
 
         if not payment.amount or (payment.amount <= 0):
-            raise serializers.ValidationError("Сумма платежа должна быть положительной.")
+            raise serializers.ValidationError(
+                "Сумма платежа должна быть положительной."
+            )
         if not (payment.paid_course or payment.paid_lesson):
-            raise serializers.ValidationError("Платёж должен быть привязан к курсу или уроку.")
+            raise serializers.ValidationError(
+                "Платёж должен быть привязан к курсу или уроку."
+            )
         return attrs
