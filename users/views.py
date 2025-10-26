@@ -91,7 +91,6 @@ class PaymentCheckoutCreateAPIView(APIView):
                 "stripe_price_id",
                 "stripe_session_id",
                 "checkout_url",
-                "status",
             ]
         )
 

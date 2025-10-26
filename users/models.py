@@ -119,7 +119,7 @@ class Payment(models.Model):
         help_text="Укажите ID сессии",
     )
     checkout_url = models.URLField(
-        max_length=400,
+        max_length=2000,
         blank=True,
         null=True,
         verbose_name="Ссыла на оплату",
