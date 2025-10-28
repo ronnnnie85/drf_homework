@@ -172,6 +172,7 @@ CELERY_RESULT_BACKEND = os.getenv("LOCATION")
 
 # Часовой пояс для работы Celery
 CELERY_TIMEZONE = "UTC"
+CELERY_ENABLE_UTC = True
 
 # Флаг отслеживания выполнения задач
 CELERY_TASK_TRACK_STARTED = True

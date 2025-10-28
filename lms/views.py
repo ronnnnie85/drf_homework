@@ -21,7 +21,7 @@ from lms.serializers import (
     LessonSerializer,
     SubscriptionToggleSerializer,
 )
-
+from lms.tasks import send_course_update_emails
 
 class CourseViewSet(ModelViewSet):
     queryset = Course.objects.all()
@@ -37,6 +37,11 @@ class CourseViewSet(ModelViewSet):
         course = serializer.save()
         course.owner = self.request.user
         course.save()
+
+    def perform_update(self, serializer):
+        course = serializer.save()
+
+        send_course_update_emails.delay(course.id)
 
 
 class LessonCreateView(CreateAPIView):
