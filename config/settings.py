@@ -14,6 +14,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from celery.schedules import crontab
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     "django_filters",
     "rest_framework_simplejwt",
     "drf_yasg",
+    "django_celery_beat",
 ]
 
 MIDDLEWARE = [
@@ -162,3 +164,26 @@ STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
 STRIPE_SUCCESS_URL = os.getenv("STRIPE_SUCCESS_URL")
 STRIPE_CANCEL_URL = os.getenv("STRIPE_CANCEL_URL")
 STRIPE_CURRENCY = os.getenv("STRIPE_CURRENCY", "rub")
+
+# URL-адрес брокера сообщений
+CELERY_BROKER_URL = os.getenv("LOCATION")
+
+# URL-адрес брокера результатов, также Redis
+CELERY_RESULT_BACKEND = os.getenv("LOCATION")
+
+# Часовой пояс для работы Celery
+CELERY_TIMEZONE = "UTC"
+CELERY_ENABLE_UTC = True
+
+# Флаг отслеживания выполнения задач
+CELERY_TASK_TRACK_STARTED = True
+
+# Максимальное время на выполнение задачи
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+CELERY_BEAT_SCHEDULE = {
+    "deactivate-inactive-users-daily": {
+        "task": "users.tasks.deactivate_inactive_users",
+        "schedule": crontab(hour=3, minute=0),  # каждый день в 03:00 по TIME_ZONE
+    },
+}
