@@ -65,7 +65,9 @@ jobs:
           ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@158.160.190.68 << 'EOF'
           set -e
           cd /var/www/drf_homework
-          git pull origin develop
+          
+          git fetch origin
+          git reset --hard origin/develop
 
           source venv/bin/activate
           pip install -r requirements.txt
